@@ -16,5 +16,11 @@ namespace InternalMeetingApp
         public MeetingCategory Category { get; set; }
         public MeetingType Type { get; set; }
         public List<Atendee> Atendees { get; set; }
+
+        public Meeting()
+        {
+            this.Atendees = new List<Atendee>();
+            ResponsiblePerson = new Person();
+        }
     }
 }
