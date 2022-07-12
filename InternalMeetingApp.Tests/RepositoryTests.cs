@@ -29,11 +29,11 @@ namespace InternalMeetingApp.Tests
             var repository = new Repository();
             var meeting = new Meeting();
             meeting.Name = "meeto neimas";
-            repository.Add(meeting);
             var person = new Person();
             person.FirstName = "Ausra";
             person.LastName = "Lekaviciute";
             meeting.ResponsiblePerson = person;
+            repository.Add(meeting);
 
             // Act
             repository.Delete(0, person);

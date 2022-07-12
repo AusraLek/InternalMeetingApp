@@ -2,7 +2,8 @@
 
 var repository = new Repository();
 var meetingFilter = new MeetingFilter(repository);
-var meetingActions = new MeetingActions(repository,meetingFilter);
+var consoleHandler = new ConsoleHandler();
+var meetingActions = new MeetingActions(repository,meetingFilter, consoleHandler);
 var loginPerson = meetingActions.InputFullName();
 var exit = false;
 

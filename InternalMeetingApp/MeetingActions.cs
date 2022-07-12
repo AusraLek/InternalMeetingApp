@@ -10,48 +10,41 @@ namespace InternalMeetingApp
     {
         private readonly Repository repository;
         private readonly MeetingFilter meetingFilter;
+        private readonly IConsoleHandler consoleHandler;
 
-        public MeetingActions(Repository repository, MeetingFilter meetingFilter)
+        public MeetingActions(Repository repository, MeetingFilter meetingFilter, IConsoleHandler consoleHandler)
         {
             this.repository = repository;
             this.meetingFilter = meetingFilter;
+            this.consoleHandler = consoleHandler;
         }
 
         public void AddMeeting(Person loginPerson)
         {
             var meeting = new Meeting();
             meeting.ResponsiblePerson = loginPerson;
-            Console.WriteLine("Enter meeting name");
-            meeting.Name = Console.ReadLine();
+            meeting.Name = this.consoleHandler.AskForString("Enter meeting name");
+            meeting.Description = this.consoleHandler.AskForString("Enter description");
 
-            Console.WriteLine("Enter description");
-            meeting.Description = Console.ReadLine();
-
-            Console.WriteLine("Enter number of category: 1.CodeMonkey, 2.Hub, 3.Short, 4.Teambuilding");
-            var categoryIndex = Convert.ToInt32(Console.ReadLine());
+            var categoryIndex = this.consoleHandler.AskForInt("Enter number of category: " +
+                "1.CodeMonkey, 2.Hub, 3.Short, 4.Teambuilding");
             meeting.Category = (MeetingCategory)categoryIndex;
 
-            Console.WriteLine("Enter number of type: 1.Live, 2.In person");
-            var typeIndex = Convert.ToInt32(Console.ReadLine());
+            var typeIndex = this.consoleHandler.AskForInt("Enter number of type: 1.Live, 2.In person");
             meeting.Type = (MeetingType)typeIndex;
 
-            Console.WriteLine("Enter start date in format MM/dd/yyyy HH:mm:ss");
-            meeting.StartDate = DateTime.Parse(Console.ReadLine());
-
-            Console.WriteLine("Enter end date in format MM/dd/yyyy HH:mm:ss");
-            meeting.EndDate = DateTime.Parse(Console.ReadLine());
+            meeting.StartDate = this.consoleHandler.AskForDate("Enter start date in format MM/dd/yyyy HH:mm:ss");
+            meeting.EndDate = this.consoleHandler.AskForDate("Enter end date in format MM/dd/yyyy HH:mm:ss");
 
             this.repository.Add(meeting);
-            Console.Clear();
-            Console.WriteLine("Meeting successfully added!");
+            this.consoleHandler.Notify("Meeting successfully added!");
         }
 
         public void DeleteMeeting(Person loginPerson)
         {
             var deleteIndex = SelectMeeting();
             this.repository.Delete(deleteIndex, loginPerson);
-            Console.Clear();
-            Console.WriteLine("Meeting successfully deleted!");
+            this.consoleHandler.Notify("Meeting successfully deleted!");
         }
 
         public void AddPersonToMeeting()
@@ -64,8 +57,8 @@ namespace InternalMeetingApp
             atendee.AdditionTime = addPersonDate;
             var atendeeMeetingIndex = SelectMeeting();
             this.repository.AddAtendee(atendeeMeetingIndex, atendee);
-            Console.Clear();
-            Console.WriteLine("Person successfully added!");
+            this.consoleHandler.Notify("Person successfully added!");
+
         }
 
         public void DeletePerson()
@@ -73,8 +66,7 @@ namespace InternalMeetingApp
             var personToDelete = InputFullName();
             var atendeeMeetingIndex = SelectMeeting();
             this.repository.DeleteAtendee(atendeeMeetingIndex, personToDelete);
-            Console.Clear();
-            Console.WriteLine("Person successfully deleted!");
+            this.consoleHandler.Notify("Person successfully deleted!");
         }
 
         public void ListAllMeetings()
@@ -85,14 +77,12 @@ namespace InternalMeetingApp
 
         public void FilterMeetings()
         {
-            Console.WriteLine("Filter by " +
+           var filternumber = this.consoleHandler.AskForString("Filter by " +
            "1. Description " +
            "2. Responsible Person " +
            "3. Meeting Category " +
            "4. By Type " +
            "5. By Date ");
-
-            var filternumber = Console.ReadLine();
 
             var filteredMeetings = filternumber switch
             {
@@ -113,20 +103,17 @@ namespace InternalMeetingApp
 
             foreach (var meet in meetings)
             {
-                Console.WriteLine($"{index} {meet.Name} {meet.StartDate} - {meet.EndDate}");
+                this.consoleHandler.Print($"{index} {meet.Name} {meet.StartDate} - {meet.EndDate}");
                 index++;
             }
-            Console.WriteLine("Enter meeting ID:");
-            var enteredIndex = int.Parse(Console.ReadLine());
-
+            var enteredIndex = this.consoleHandler.AskForInt("Enter meeting ID:");
             return enteredIndex - 1;
         }
 
         public Person InputFullName()
         {
             var person = new Person();
-            Console.WriteLine("Enter full name");
-            var name = Console.ReadLine();
+            var name = this.consoleHandler.AskForString("Enter full name");
             var nameSpliting = name.Split(' ');
             person.FirstName = nameSpliting[0];
             person.LastName = nameSpliting[1];
@@ -137,20 +124,22 @@ namespace InternalMeetingApp
         {
             foreach (var meet in meetings)
             {
-                Console.WriteLine($"Name: {meet.Name}");
-                Console.WriteLine($"ResponsiblePerson: {meet.ResponsiblePerson.FirstName} {meet.ResponsiblePerson.LastName}");
                 List<string> atendees = new List<string>();
                 foreach (var atendee in meet.Atendees)
                 {
                     atendees.Add($"{atendee.Person.FirstName} {atendee.Person.LastName}");
                 }
-                Console.WriteLine($"Atendees: {string.Join(", ", atendees)}");
-                Console.WriteLine($"Description: {meet.Description}");
-                Console.WriteLine($"Category: {meet.Category}");
-                Console.WriteLine($"Type: {meet.Type}");
-                Console.WriteLine($"StartDate: {meet.StartDate}");
-                Console.WriteLine($"EndDate: {meet.EndDate}");
-                Console.WriteLine();
+
+                this.consoleHandler.Print(
+                    $"Name: {meet.Name}",
+                    $"ResponsiblePerson: {meet.ResponsiblePerson.FirstName} {meet.ResponsiblePerson.LastName}",
+                    $"Atendees: {string.Join(", ", atendees)}",
+                    $"Description: {meet.Description}",
+                    $"Category: {meet.Category}",
+                    $"Type: {meet.Type}",
+                    $"StartDate: {meet.StartDate}",
+                    $"EndDate: {meet.EndDate}",
+                    "");
             }
         }
     }
