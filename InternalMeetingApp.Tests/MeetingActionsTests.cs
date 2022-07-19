@@ -1,4 +1,5 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using FluentAssertions;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using System;
 using System.Collections.Generic;
@@ -26,21 +27,79 @@ namespace InternalMeetingApp.Tests
         [TestMethod]
         public void DeleteMeeting()
         {
-            var meeting = new Meeting();
-            meeting.Name = "meeto neimas";
-            var person = new Person();
-            person.FirstName = "Ausra";
-            person.LastName = "Lekaviciute";
+            // Arrange
+            var meeting = new Meeting
+            {
+                Name = "meeto neimas",
+            };
+            var person = new Person
+            {
+                FirstName = "Ausra",
+                LastName = "Lekaviciute"
+            };
+
             meeting.ResponsiblePerson = person;
             this.repository.Add(meeting);
             this.consoleHandler
                 .Setup(mock => mock.AskForInt(It.IsAny<string>()))
                 .Returns(1);
 
+            // Act
             this.meetingActions.DeleteMeeting(person);
 
-            Assert.AreEqual(0, this.repository.ListAll().Count());
+            // Assert
+            this.repository.ListAll().Should().HaveCount(1);
+
+            //this.repository.ListAll().Count().Should().Be(1);
+            //Assert.AreEqual(0, this.repository.ListAll().Count());
 
         }
+
+        [TestMethod]
+        public void AddMeeting()
+        {
+            // Arrange
+            var repository = new Repository();
+            var person = new Person
+            {
+                FirstName = "Ausra",
+                LastName = "Lekaviciute"
+            };
+            this.consoleHandler
+                .SetupSequence(mock => mock.AskForInt(It.IsAny<string>()))
+                .Returns(4)
+                .Returns(2);
+            this.consoleHandler
+                .SetupSequence(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("Test Name")
+                .Returns("Test Description");
+
+            // Act
+            this.meetingActions.AddMeeting(person);
+
+            // Assert
+            this.repository.ListAll().Should().HaveCount(1);
+            this.repository
+                .ListAll()
+                .First()
+                .Should()
+                .BeEquivalentTo(new Meeting
+                {
+                    Name = "Test Name",
+                    Description = "Test Description",
+                    Category = MeetingCategory.TeamBuilding,
+                    Type = MeetingType.InPerson,
+                    ResponsiblePerson = new Person
+                    {
+                        FirstName = "Ausra",
+                        LastName = "Lekaviciute"
+                    }
+                });
+
+            //Assert.AreEqual(1, this.repository.ListAll().Count());
+
+        }
+
+
     }
 }

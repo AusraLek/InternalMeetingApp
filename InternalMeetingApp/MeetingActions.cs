@@ -58,7 +58,6 @@ namespace InternalMeetingApp
             var atendeeMeetingIndex = SelectMeeting();
             this.repository.AddAtendee(atendeeMeetingIndex, atendee);
             this.consoleHandler.Notify("Person successfully added!");
-
         }
 
         public void DeletePerson()
