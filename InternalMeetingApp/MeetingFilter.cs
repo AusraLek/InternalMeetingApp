@@ -8,9 +8,9 @@ namespace InternalMeetingApp
 {
     public class MeetingFilter
     {
-        private readonly Repository repository;
+        private readonly IRepository repository;
 
-        public MeetingFilter(Repository repository)
+        public MeetingFilter(IRepository repository)
         {
             this.repository = repository;
         }

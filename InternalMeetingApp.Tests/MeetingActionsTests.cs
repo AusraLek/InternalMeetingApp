@@ -14,41 +14,42 @@ namespace InternalMeetingApp.Tests
     {
         private readonly Mock<IConsoleHandler> consoleHandler;
         private readonly MeetingActions meetingActions;
-        private readonly Repository repository;
+        private readonly Mock<IRepository> repository;
 
         public MeetingActionsTests()
         {
-            this.repository = new Repository();
-            var meetingFilter = new MeetingFilter(this.repository);
+            this.repository = new Mock<IRepository>();
+            var meetingFilter = new MeetingFilter(this.repository.Object);
             this.consoleHandler = new Mock<IConsoleHandler>();
-            this.meetingActions = new MeetingActions(this.repository, meetingFilter, this.consoleHandler.Object);
+            this.meetingActions = new MeetingActions(this.repository.Object, meetingFilter, this.consoleHandler.Object);
         }
 
         [TestMethod]
-        public void DeleteMeeting()
+        [DataRow(1)]
+        [DataRow(429495)]
+        public void DeleteMeeting(int index)
         {
             // Arrange
-            var meeting = new Meeting
-            {
-                Name = "meeto neimas",
-            };
             var person = new Person
             {
                 FirstName = "Ausra",
                 LastName = "Lekaviciute"
             };
-
-            meeting.ResponsiblePerson = person;
-            this.repository.Add(meeting);
+            this.repository
+                .Setup(mock => mock.ListAll())
+                .Returns(new List<Meeting>());
             this.consoleHandler
                 .Setup(mock => mock.AskForInt(It.IsAny<string>()))
-                .Returns(1);
+                .Returns(index + 1);
 
             // Act
             this.meetingActions.DeleteMeeting(person);
 
             // Assert
-            this.repository.ListAll().Should().HaveCount(0);
+            this.repository
+                .Verify(mock => mock.Delete(index, person), Times.Once);
+            this.consoleHandler
+                .Verify(mock => mock.Notify(It.IsAny<string>()), Times.Once);
 
             //this.repository.ListAll().Count().Should().Be(1);
             //Assert.AreEqual(0, this.repository.ListAll().Count());
@@ -61,7 +62,7 @@ namespace InternalMeetingApp.Tests
         public void AddMeeting(string firstName, string lastName)
         {
             // Arrange
-            var repository = new Repository();
+            Meeting actualMeeting = null;
             var person = new Person
             {
                 FirstName = firstName,
@@ -75,15 +76,15 @@ namespace InternalMeetingApp.Tests
                 .SetupSequence(mock => mock.AskForString(It.IsAny<string>()))
                 .Returns("Test Name")
                 .Returns("Test Description");
+            this.repository
+                .Setup(mock => mock.Add(It.IsAny<Meeting>()))
+                .Callback<Meeting>(meeting => actualMeeting = meeting);
 
             // Act
             this.meetingActions.AddMeeting(person);
 
             // Assert
-            this.repository.ListAll().Should().HaveCount(1);
-            this.repository
-                .ListAll()
-                .First()
+            actualMeeting
                 .Should()
                 .BeEquivalentTo(new Meeting
                 {

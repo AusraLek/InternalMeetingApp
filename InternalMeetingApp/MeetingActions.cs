@@ -8,11 +8,11 @@ namespace InternalMeetingApp
 {
     public class MeetingActions
     {
-        private readonly Repository repository;
+        private readonly IRepository repository;
         private readonly MeetingFilter meetingFilter;
         private readonly IConsoleHandler consoleHandler;
 
-        public MeetingActions(Repository repository, MeetingFilter meetingFilter, IConsoleHandler consoleHandler)
+        public MeetingActions(IRepository repository, MeetingFilter meetingFilter, IConsoleHandler consoleHandler)
         {
             this.repository = repository;
             this.meetingFilter = meetingFilter;

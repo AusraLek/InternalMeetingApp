@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace InternalMeetingApp
 {
-    public class Repository
+    public class Repository : IRepository
     {
         private List<Meeting> Meetings { get; set; }
 
@@ -103,7 +103,7 @@ namespace InternalMeetingApp
 
         private bool MeetingIsInRange(DateTime meetingStart, DateTime meetingEnd, DateTime rangeStart, DateTime rangeEnd)
         {
-            if(meetingStart <= rangeStart && meetingEnd >= rangeEnd)
+            if (meetingStart <= rangeStart && meetingEnd >= rangeEnd)
             {
                 return true;
             }
