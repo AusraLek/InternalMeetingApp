@@ -48,7 +48,7 @@ namespace InternalMeetingApp.Tests
             this.meetingActions.DeleteMeeting(person);
 
             // Assert
-            this.repository.ListAll().Should().HaveCount(1);
+            this.repository.ListAll().Should().HaveCount(0);
 
             //this.repository.ListAll().Count().Should().Be(1);
             //Assert.AreEqual(0, this.repository.ListAll().Count());
@@ -56,14 +56,16 @@ namespace InternalMeetingApp.Tests
         }
 
         [TestMethod]
-        public void AddMeeting()
+        [DataRow("Ausra", "Lekaviciute")]
+        [DataRow(null, null)]
+        public void AddMeeting(string firstName, string lastName)
         {
             // Arrange
             var repository = new Repository();
             var person = new Person
             {
-                FirstName = "Ausra",
-                LastName = "Lekaviciute"
+                FirstName = firstName,
+                LastName = lastName
             };
             this.consoleHandler
                 .SetupSequence(mock => mock.AskForInt(It.IsAny<string>()))
@@ -91,15 +93,13 @@ namespace InternalMeetingApp.Tests
                     Type = MeetingType.InPerson,
                     ResponsiblePerson = new Person
                     {
-                        FirstName = "Ausra",
-                        LastName = "Lekaviciute"
+                        FirstName = firstName,
+                        LastName = lastName
                     }
                 });
 
             //Assert.AreEqual(1, this.repository.ListAll().Count());
 
         }
-
-
     }
 }

@@ -23,7 +23,9 @@ namespace InternalMeetingApp
         {
             var meeting = new Meeting();
             meeting.ResponsiblePerson = loginPerson;
-            meeting.Name = this.consoleHandler.AskForString("Enter meeting name");
+
+            meeting.Name = this.consoleHandler.AskForString("Enter Meeting Name");
+
             meeting.Description = this.consoleHandler.AskForString("Enter description");
 
             var categoryIndex = this.consoleHandler.AskForInt("Enter number of category: " +

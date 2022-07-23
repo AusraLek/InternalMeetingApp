@@ -10,18 +10,35 @@ namespace InternalMeetingApp
     {
         public string AskForString(string text)
         {
-            Console.WriteLine(text);
-            return Console.ReadLine();
+            string value = null;
+            while (string.IsNullOrWhiteSpace(value))
+            {
+                Console.WriteLine(text);
+                value = Console.ReadLine();
+            }
+            return value;
         }
 
         public int AskForInt(string text)
         {
-            return Convert.ToInt32(AskForString(text));
+            while (true)
+            {
+                if (int.TryParse(AskForString(text), out var value))
+                {
+                    return value;
+                }
+            }
         }
 
         public DateTime AskForDate(string text)
         {
-            return DateTime.Parse(AskForString(text));
+            while (true)
+            {
+                if (DateTime.TryParse(AskForString(text), out var value))
+                {
+                    return value;
+                }
+            }
         }
 
         public void Print(params string[] texts)
