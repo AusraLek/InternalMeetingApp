@@ -64,8 +64,8 @@ namespace InternalMeetingApp
 
         public void DeletePerson()
         {
-            var personToDelete = InputFullName();
             var atendeeMeetingIndex = SelectMeeting();
+            var personToDelete = InputFullName();
             this.repository.DeleteAtendee(atendeeMeetingIndex, personToDelete);
             this.consoleHandler.Notify("Person successfully deleted!");
         }

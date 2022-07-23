@@ -102,5 +102,30 @@ namespace InternalMeetingApp.Tests
             //Assert.AreEqual(1, this.repository.ListAll().Count());
 
         }
+        [TestMethod]
+        [DataRow(1)]
+        [DataRow(429495)]
+        public void DeletePerson(int index)
+        {
+            // Arrange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("Full Name");
+            this.repository
+                .Setup(mock => mock.ListAll())
+                .Returns(new List<Meeting>());
+            this.consoleHandler
+                .Setup(mock => mock.AskForInt(It.IsAny<string>()))
+                .Returns(index + 1);
+
+            // Act
+            this.meetingActions.DeletePerson();
+
+            // Assert
+            this.repository
+                .Verify(mock => mock.DeleteAtendee(index, It.IsAny<Person>()), Times.Once);
+            this.consoleHandler
+                .Verify(mock => mock.Notify(It.IsAny<string>()), Times.Once);
+        }
     }
 }
