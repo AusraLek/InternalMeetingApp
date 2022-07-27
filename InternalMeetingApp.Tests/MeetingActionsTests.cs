@@ -127,5 +127,69 @@ namespace InternalMeetingApp.Tests
             this.consoleHandler
                 .Verify(mock => mock.Notify(It.IsAny<string>()), Times.Once);
         }
-    }
+
+        [TestMethod]
+        public void ListAllMeetings()
+        {
+            // Arange
+            var meetings = new List<Meeting> {new Meeting(), new Meeting()};
+            this.repository
+                .Setup(mock => mock.ListAll())
+                .Returns(meetings);
+
+            // Act
+            this.meetingActions.ListAllMeetings();
+
+            // Assert
+            this.consoleHandler
+                .Verify(mock => mock.Print(It.IsAny<string[]>()), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        public void SelectMeeting()
+        {
+            // Arange
+            var meetsList = new List<Meeting>();
+            var meet1 = new Meeting();
+            var meet2 = new Meeting();
+            meetsList.Add(meet1);
+            meetsList.Add(meet2);
+            this.repository
+                .Setup(mock => mock.ListAll())
+                .Returns(meetsList);
+            this.consoleHandler
+                .Setup(mock => mock.AskForInt(It.IsAny<string>()))
+                .Returns(2);
+
+            // Act
+            var result = this.meetingActions.SelectMeeting();
+
+            //Assert
+           result.Should().Be(1);
+            this.consoleHandler
+                .Verify(mock => mock.Print(It.IsAny<string>()), Times.Exactly(2));
+        }
+
+        [TestMethod]
+        [DataRow ("Ausra Lekaviciute")]
+        public void InputFullName(string name)
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns(name);
+            
+            //Act
+            var result = this.meetingActions.InputFullName();
+
+            //Assert
+            result
+                .Should()
+                .BeEquivalentTo(new Person
+                {
+                    FirstName = "Ausra",
+                    LastName = "Lekaviciute"
+                });
+        }
+    }   
 }
