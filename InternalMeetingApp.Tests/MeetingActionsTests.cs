@@ -15,13 +15,14 @@ namespace InternalMeetingApp.Tests
         private readonly Mock<IConsoleHandler> consoleHandler;
         private readonly MeetingActions meetingActions;
         private readonly Mock<IRepository> repository;
+        private readonly Mock<IMeetingFilter> meetingFilter;
 
         public MeetingActionsTests()
         {
             this.repository = new Mock<IRepository>();
-            var meetingFilter = new MeetingFilter(this.repository.Object);
+            this.meetingFilter = new Mock<IMeetingFilter>();
             this.consoleHandler = new Mock<IConsoleHandler>();
-            this.meetingActions = new MeetingActions(this.repository.Object, meetingFilter, this.consoleHandler.Object);
+            this.meetingActions = new MeetingActions(this.repository.Object, this.meetingFilter.Object, this.consoleHandler.Object);
         }
 
         [TestMethod]
@@ -50,10 +51,6 @@ namespace InternalMeetingApp.Tests
                 .Verify(mock => mock.Delete(index, person), Times.Once);
             this.consoleHandler
                 .Verify(mock => mock.Notify(It.IsAny<string>()), Times.Once);
-
-            //this.repository.ListAll().Count().Should().Be(1);
-            //Assert.AreEqual(0, this.repository.ListAll().Count());
-
         }
 
         [TestMethod]
@@ -98,10 +95,8 @@ namespace InternalMeetingApp.Tests
                         LastName = lastName
                     }
                 });
-
-            //Assert.AreEqual(1, this.repository.ListAll().Count());
-
         }
+
         [TestMethod]
         [DataRow(1)]
         [DataRow(429495)]
@@ -132,7 +127,7 @@ namespace InternalMeetingApp.Tests
         public void ListAllMeetings()
         {
             // Arange
-            var meetings = new List<Meeting> {new Meeting(), new Meeting()};
+            var meetings = new List<Meeting> { new Meeting(), new Meeting() };
             this.repository
                 .Setup(mock => mock.ListAll())
                 .Returns(meetings);
@@ -165,20 +160,20 @@ namespace InternalMeetingApp.Tests
             var result = this.meetingActions.SelectMeeting();
 
             //Assert
-           result.Should().Be(1);
+            result.Should().Be(1);
             this.consoleHandler
                 .Verify(mock => mock.Print(It.IsAny<string>()), Times.Exactly(2));
         }
 
         [TestMethod]
-        [DataRow ("Ausra Lekaviciute")]
+        [DataRow("Ausra Lekaviciute")]
         public void InputFullName(string name)
         {
             // Arange
             this.consoleHandler
                 .Setup(mock => mock.AskForString(It.IsAny<string>()))
                 .Returns(name);
-            
+
             //Act
             var result = this.meetingActions.InputFullName();
 
@@ -190,6 +185,103 @@ namespace InternalMeetingApp.Tests
                     FirstName = "Ausra",
                     LastName = "Lekaviciute"
                 });
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ByDescription()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("1");
+
+            // Act
+            this.meetingActions.FilterMeetings();
+
+            // Assert
+            this.meetingFilter
+                .Verify(mock => mock.FilterByDescription(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ByResponsiblePerson()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("2");
+
+            // Act
+            this.meetingActions.FilterMeetings();
+
+            // Assert
+            this.meetingFilter
+                .Verify(mock => mock.FilterByResponsiblePerson(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ByCategory()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("3");
+
+            // Act
+            this.meetingActions.FilterMeetings();
+
+            // Assert
+            this.meetingFilter
+                .Verify(mock => mock.FilterByCategory(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ByType()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("4");
+
+            // Act
+            this.meetingActions.FilterMeetings();
+
+            // Assert
+            this.meetingFilter
+                .Verify(mock => mock.FilterByType(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ByDate()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("5");
+
+            // Act
+            this.meetingActions.FilterMeetings();
+
+            // Assert
+            this.meetingFilter
+                .Verify(mock => mock.FilterByDate(), Times.Once);
+        }
+
+        [TestMethod]
+        public void FilterMeetings_ThrowsException()
+        {
+            // Arange
+            this.consoleHandler
+                .Setup(mock => mock.AskForString(It.IsAny<string>()))
+                .Returns("s");
+
+            // Act
+            Action filter = () => this.meetingActions.FilterMeetings();
+
+            // Assert
+            filter
+                .Should()
+                .Throw<Exception>();
         }
     }   
 }

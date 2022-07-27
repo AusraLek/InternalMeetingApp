@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace InternalMeetingApp
 {
-    public class MeetingFilter
+    public class MeetingFilter : IMeetingFilter
     {
         private readonly IRepository repository;
 

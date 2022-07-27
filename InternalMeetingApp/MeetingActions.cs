@@ -9,10 +9,10 @@ namespace InternalMeetingApp
     public class MeetingActions
     {
         private readonly IRepository repository;
-        private readonly MeetingFilter meetingFilter;
+        private readonly IMeetingFilter meetingFilter;
         private readonly IConsoleHandler consoleHandler;
 
-        public MeetingActions(IRepository repository, MeetingFilter meetingFilter, IConsoleHandler consoleHandler)
+        public MeetingActions(IRepository repository, IMeetingFilter meetingFilter, IConsoleHandler consoleHandler)
         {
             this.repository = repository;
             this.meetingFilter = meetingFilter;
@@ -121,7 +121,7 @@ namespace InternalMeetingApp
             return person;
         }
 
-        public void PrintMeetings(IEnumerable<Meeting> meetings)
+        private void PrintMeetings(IEnumerable<Meeting> meetings)
         {
             foreach (var meet in meetings)
             {
