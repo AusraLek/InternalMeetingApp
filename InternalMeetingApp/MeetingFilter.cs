@@ -9,49 +9,57 @@ namespace InternalMeetingApp
     public class MeetingFilter : IMeetingFilter
     {
         private readonly IRepository repository;
+        private readonly IConsoleHandler consoleHandler;
 
-        public MeetingFilter(IRepository repository)
+        public MeetingFilter(IRepository repository, IConsoleHandler consoleHandler)
         {
             this.repository = repository;
+            this.consoleHandler = consoleHandler;
         }
 
         public IEnumerable<Meeting> FilterByCategory()
         {
-            Console.WriteLine("1.CodeMonkey, 2.Hub, 3.Short, 4.Teambuilding");
-            var filterBy = Console.ReadLine();//readline => integer => meeting category
-            var filterMeetingCategory = MeetingCategory.TeamBuilding;
+            var filterBy = this.consoleHandler
+                .AskForInt("1.CodeMonkey, 2.Hub, 3.Short, 4.Teambuilding");
+            var filterMeetingCategory = (MeetingCategory)filterBy;
             return this.repository.MeetingByCategory(filterMeetingCategory);
         }
+
         public IEnumerable<Meeting> FilterByDescription()
         {
-            Console.WriteLine("Enter searching phrase");
-            var filterBy = Console.ReadLine();
+            var filterBy = this.consoleHandler
+                .AskForString("Enter searching phrase");
             return this.repository.MeetingByDescription(filterBy);
         }
+
         public IEnumerable<Meeting> FilterByResponsiblePerson()
         {
-            Console.WriteLine("Enter Name");
-            var firstName = Console.ReadLine();
-            var person = new Person();
-            person.FirstName = firstName;
-            var lastName = Console.ReadLine();
-            person.LastName = lastName;
+            var firstName = this.consoleHandler
+                .AskForString("Enter First Name");
+            var lastName = this.consoleHandler
+                .AskForString("Enter Last Name");
+            var person = new Person
+            {
+                FirstName = firstName,
+                LastName = lastName,
+            };
             return this.repository.MeetingByResponsiblePerson(person);
         }
 
         public IEnumerable<Meeting> FilterByType()
         {
-            Console.WriteLine("Live = 1, InPerson = 2");
-            var filterBy = Console.ReadLine();//readline => integer => meeting category
-            var filterMeetingByType = MeetingType.TeamBuilding;
+            var filterBy = this.consoleHandler
+                .AskForInt("Live = 1, InPerson = 2");
+            var filterMeetingByType = (MeetingType)filterBy;
             return this.repository.MeetingByType(filterMeetingByType);
         }
+
         public IEnumerable<Meeting> FilterByDate()
         {
-            Console.WriteLine("Enter date from in format MM/dd/yyyy");
-            var fromDate = DateTime.Parse(Console.ReadLine());
-            Console.WriteLine("Enter date from in format MM/dd/yyyy");
-            var toDate = DateTime.Parse(Console.ReadLine());
+            var fromDate = this.consoleHandler
+                .AskForDate("Enter start date in format MM/dd/yyyy HH:mm:ss");
+            var toDate = this.consoleHandler
+                .AskForDate("Enter end date from in format MM/dd/yyyy HH:mm:ss");
             return this.repository.MeetingByDate(fromDate, toDate);
         }
     }

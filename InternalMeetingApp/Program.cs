@@ -1,8 +1,8 @@
 ﻿using InternalMeetingApp;
 
 var repository = new Repository();
-var meetingFilter = new MeetingFilter(repository);
 var consoleHandler = new ConsoleHandler();
+var meetingFilter = new MeetingFilter(repository, consoleHandler);
 var meetingActions = new MeetingActions(repository,meetingFilter, consoleHandler);
 var loginPerson = meetingActions.InputFullName();
 var exit = false;
