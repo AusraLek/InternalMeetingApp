@@ -1,5 +1,4 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using InternalMeetingApp;
 using System.Linq;
 
 namespace InternalMeetingApp.Tests
